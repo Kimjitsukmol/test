@@ -208,7 +208,6 @@ function findProduct() {
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td>${productList[i]["รหัสสินค้า"]}</td>
         <td class="name-cell">${productList[i]["ชื่อสินค้า"]}</td>
         <td><input type='number' value='1' min='1' oninput='updateTotals()' style='width: 23px;'></td>
         <td class='unit-price'>${unitPrice.toFixed(0)}</td>
@@ -237,7 +236,6 @@ function findProduct() {
     if (!isNaN(num) && num >= 1 && num <= 10000) {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${num}</td>
         <td>รายการสินค้า</td>
         <td><input type='number' value='1' min='1' oninput='updateTotals()' style='width: 23px;'></td>
         <td class='unit-price'>${num}</td>
@@ -431,16 +429,20 @@ function generateReceiptHTML() {
                + "<tr><th style='text-align:left;'>สินค้า</th><th style='text-align:center;'>จำนวน</th><th style='text-align:right;'>ราคา</th></tr>";
 
   rows.forEach(row => {
-    const cols = row.querySelectorAll("td");
-    const name = cols[1].textContent;
-    const qty = cols[2].querySelector("input").value;
-    const price = cols[3].textContent;
-    listHTML += "<tr>"
-              + `<td>${name}</td>`
-              + `<td style='text-align:center;'>${qty}</td>`
-              + `<td style='text-align:right;'>฿${price}</td>`
-              + "</tr>";
-  });
+  const cols = row.querySelectorAll("td");
+
+  const name = cols[0].textContent;
+  const qtyInput = cols[1].querySelector("input");
+  const qty = qtyInput ? qtyInput.value : "0"; // กัน input หาย
+  const price = cols[2].textContent;
+
+  listHTML += "<tr>"
+            + `<td>${name}</td>`
+            + `<td style='text-align:center;'>${qty}</td>`
+            + `<td style='text-align:right;'>฿${price}</td>`
+            + "</tr>";
+});
+
 
   listHTML += "</table>";
 
@@ -741,31 +743,6 @@ function fetchAndStoreProductList() {
 }
 
 
-
-// const form = document.getElementById('productForm');
-//     form.addEventListener('submit', async (e) => {
-//       e.preventDefault();
-//       const data = {
-//         barcode: document.getElementById('barcode').value,
-//         name: document.getElementById('name').value,
-//         price: document.getElementById('price').value
-//       };
-
-//       const response = await fetch('https://script.google.com/macros/s/AKfycbwoK3qwfpO4BXTpSN3jKxL4hXdp1E4YiuN2O-Z2Qa1He-b1k2TAPrxjoVlWDSdXOISH/exec', {
-//         method: 'POST',
-//         body: JSON.stringify(data),
-//         headers: {
-//           'Content-Type': 'application/json'
-//         }
-//       });
-
-//       if (response.ok) {
-//         alert('บันทึกสำเร็จ!');
-//         form.reset();
-//       } else {
-//         alert('เกิดข้อผิดพลาด');
-//       }
-//     });
     
 function holdCurrentBill() {
   const rows = document.querySelectorAll("#productBody tr");
@@ -784,10 +761,9 @@ function holdCurrentBill() {
     const unit = parseInt(row.querySelector(".item-row-price").dataset.unitPrice);
     total += qty * unit;
     return {
-      code: row.cells[0].textContent,
-      name: row.cells[1].textContent,
+      name: row.cells[0].textContent,
       qty,
-      price: row.cells[3].textContent,
+      price: row.cells[1].textContent,
       unit
     };
   });
@@ -866,7 +842,6 @@ function loadHeldBill() {
   data.forEach(item => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${item.code}</td>
       <td>${item.name}</td>
       <td><input type='number' value='${item.qty}' min='1' oninput='updateTotals()' style='width: 23px;'></td>
       <td class='unit-price'>${item.unit}</td>
@@ -898,12 +873,11 @@ function loadBillByName(name) {
   bill.items.forEach(item => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${item.code}</td>
       <td>${item.name}</td>
       <td><input type='number' value='${item.qty}' min='1' oninput='updateTotals()' style='width: 23px;'></td>
       <td class='unit-price'>${item.unit}</td>
       <td class='item-row-price' data-unit-price='${item.unit}'>${(item.qty * item.unit).toFixed(0)}</td>
-      <td><button class='delete-btn'>❌</button></td>
+      <td><button class='delete-btn'>x</button></td>
     `;
     row.querySelector(".delete-btn").addEventListener("click", function () {
       row.remove();
