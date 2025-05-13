@@ -726,6 +726,10 @@ window.addEventListener("load", () => {
   } else {
     fetchAndStoreProductList(); // ถ้าไม่มีใน local ให้โหลดจากเน็ต
   }
+   document.getElementById("productCode")?.focus();
+
+  // ✅ ผูกปุ่มพักบิลให้ทำงาน
+  document.getElementById("holdBillBtn")?.addEventListener("click", holdCurrentBill);
 });
 
 // โหลดจาก Google Sheets แล้วเก็บไว้ใน localStorage
@@ -751,7 +755,7 @@ function holdCurrentBill() {
     return;
   }
 
-  const heldBills = JSON.parse(localStorage.getItem("heldBills") || {});
+  const heldBills = JSON.parse(localStorage.getItem("heldBills") || "{}"); // ✅ แบบนี้เท่านั้น
   const nextBillNumber = Object.keys(heldBills).length + 1;
   const billName = String(nextBillNumber);
 
