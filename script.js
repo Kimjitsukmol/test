@@ -755,22 +755,32 @@ function holdCurrentBill() {
     return;
   }
 
-  const heldBills = JSON.parse(localStorage.getItem("heldBills") || "{}"); // ✅ แบบนี้เท่านั้น
+  const heldBills = JSON.parse(localStorage.getItem("heldBills") || "{}");
   const nextBillNumber = Object.keys(heldBills).length + 1;
   const billName = String(nextBillNumber);
 
   let total = 0;
   const billData = Array.from(rows).map(row => {
-    const qty = parseInt(row.querySelector("input").value);
-    const unit = parseInt(row.querySelector(".item-row-price").dataset.unitPrice);
+    const qtyInput = row.querySelector("input[type='number']");
+    const unitCell = row.querySelector(".item-row-price");
+
+    const qty = qtyInput ? parseInt(qtyInput.value) : 0;
+    const unit = unitCell?.dataset.unitPrice ? parseInt(unitCell.dataset.unitPrice) : 0;
+
     total += qty * unit;
+
     return {
       name: row.cells[0].textContent,
       qty,
-      price: row.cells[1].textContent,
+      price: row.cells[2].textContent,
       unit
     };
   });
+
+  if (total === 0) {
+    speak("ยังไม่มีสินค้า");
+    return;
+  }
 
   const now = new Date();
   const timeStr = now.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" });
@@ -786,6 +796,7 @@ function holdCurrentBill() {
   speak(`พักบิล ${billName}`);
   showBillPopup();
 }
+
 
 
 function showBillPopup() {
