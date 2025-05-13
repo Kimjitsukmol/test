@@ -899,11 +899,3 @@ function loadBillByName(name) {
 
 
 
-window.onload = function () {
-  document.getElementById("holdBillBtn")?.addEventListener("click", holdCurrentBill);
-  document.getElementById("loadBillBtn")?.addEventListener("click", loadHeldBill);
-};
-
-
-
-
